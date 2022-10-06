@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+{% endblock meta %}
+
+{% block content %}
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        // $.ajax({
+        //     url: "https://localhost:8000/wishlist/json",
+        //     method: "GET",
+        // }).then(function(data) {
+        //     data = JSON.parse(data);
+            
+        //     $.each(data, function(key, value) {
+        //         var item = '';
+                
+        //         // Iterate through objects
+        //         $.each(data, function(key, value) {
+        //             // Construct DOM elements by retrieving JSON objects
+        //             item += '<tr>';
+        //             item += '<td>' + value["nama_barang"] + '</td>';
+        //             item += '<td>' + value["harga_barang"] + '</td>';
+        //             item += '<td>' + value["deskripsi"] + '</td>';
+        //             item += '</tr>';
+        //         })
+    
+        //         // Insert rows into table
+        //         $('#table').append(item);
+        //     })
+        // })
+    
+        $(document).ready(function() {
+            $.getJSON("/wishlist/json/", function(data) {
+                for (var i=0;i<data.length;i++) {
+                    var item = '';
+                    item += '<tr>';
+                    item += '<td>' + data[i].fields.nama_barang + '</td>';
+                    item += '<td>' + data[i].fields.harga_barang + '</td>';
+                    item += '<td>' + data[i].fields.deskripsi + '</td>';
+                    item += '</tr>';
+    
+                    $(".table").append(item);
+                }
+            });    
+        });
+
+        $("#submit_ajax").click(function(){
+            $.post("/wishlist/ajax_add", 
+            {
+                nama_barang: $("#nama_barang").val(),
+                harga_barang: $("#harga_barang").val(),
+                deskripsi: $("#deskripsi").val(),
+            },
+            function(data, status) {
+                console.log(data + "\n" + status);
+            });
+        });
+    </script>
+</head>
+<nav class="navbar navbar-expand-lg bg-dark">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="container-fluid align-self-end">
+                <span class="navbar-brand mb-0 h1 text-light">Jeremy Alva Prathama</span>
+            </div>
+
+            <div class="d-flex align-self-end">
+                <button class="btn btn-outline-light">
+                    <a href="{% url 'wishlist:logout' %}" class="text-decoration-none text-light link-dark border border-0">Logout</a>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-lg d-flex flex-column justify-content-start align-items-start p-4">
+    <div>
+        <p class="fs-3">
+            Add Item
+        </p>
+    </div>
+    
+    <form action="/wishlist/ajax_add/" method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="nama_barang" class="form-label">Nama Barang</label>
+            <input type="text"  name="nama_barang" class="form-control" id="nama_barang">
+        </div>
+        <div class="mb-3">
+            <label for="harga_barang" class="form-label">Harga Barang</label>
+            <input type="number" name="harga_barang" class="form-control" id="harga_barang">
+        </div>
+        <div class="mb-3">
+            <label for="deskripsi" class="form-label">Deskripsi</label>
+            <textarea class="form-control" name="deskripsi" id="deskripsi" rows="3"></textarea>
+          </div>
+        <button type="submit" id="submit_ajax" class="btn btn-primary">Add Item</button>
+    </form>
+</div>
+
+<div class="container-lg d-flex flex-column justify-content-center align-items-center p-4">
+    <table class="table table-striped table-hover table-bordered">
+        <tr>
+            <th scope="col">Nama Barang</th>
+            <th scope="col">Harga Barang</th>
+            <th scope="col">Deskripsi</th>
+        </tr>
+    </table>
+    
+    <p class="fs-6">Sesi terakhir login: {{ last_login }}</p>
+</div>
+
+{% endblock content %}
+
